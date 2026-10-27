@@ -116,31 +116,41 @@
     }
 
     /* Cards & Panels Overrides */
-    .bg-white, .bg-white\/95 {
+    .bg-white,
+    .bg-white\/95 {
       background-color: var(--bg-card) !important;
       backdrop-filter: blur(16px);
       border-color: var(--border) !important;
       color: var(--text) !important;
     }
 
-    .bg-gray-50\/80, .bg-gray-50\/50, .bg-gray-100 {
+    .bg-gray-50\/80,
+    .bg-gray-50\/50,
+    .bg-gray-100 {
       background-color: var(--bg-card-hover) !important;
       border-color: var(--border) !important;
     }
 
-    .text-gray-900, .text-gray-800, .text-gray-700 {
+    .text-gray-900,
+    .text-gray-800,
+    .text-gray-700 {
       color: var(--text) !important;
     }
 
-    .text-gray-600, .text-gray-500, .text-gray-400 {
+    .text-gray-600,
+    .text-gray-500,
+    .text-gray-400 {
       color: var(--text-muted) !important;
     }
 
-    .border-gray-100, .border-gray-200, .border-gray-200\/80 {
+    .border-gray-100,
+    .border-gray-200,
+    .border-gray-200\/80 {
       border-color: var(--border) !important;
     }
 
-    .shadow-sm, .shadow-lg {
+    .shadow-sm,
+    .shadow-lg {
       box-shadow: var(--shadow-lg) !important;
     }
 
@@ -210,13 +220,15 @@
       transform: translateY(-1px);
     }
 
-    #resetBtn, #batchResetBtn {
+    #resetBtn,
+    #batchResetBtn {
       background: rgba(255, 255, 255, 0.06) !important;
       border: 1px solid var(--border) !important;
       color: var(--text) !important;
     }
 
-    #resetBtn:hover, #batchResetBtn:hover {
+    #resetBtn:hover,
+    #batchResetBtn:hover {
       background: rgba(255, 255, 255, 0.12) !important;
       border-color: rgba(255, 255, 255, 0.2) !important;
       transform: translateY(-1px);
@@ -275,10 +287,13 @@
     }
 
     @keyframes supportPulse {
-      0%, 100% {
+
+      0%,
+      100% {
         box-shadow: 0 8px 24px rgba(124, 58, 237, 0.45), 0 2px 6px rgba(0, 0, 0, 0.2);
         transform: scale(1);
       }
+
       50% {
         box-shadow: 0 12px 32px rgba(124, 58, 237, 0.75), 0 0 20px rgba(168, 85, 247, 0.5);
         transform: scale(1.04);
@@ -332,6 +347,7 @@
         opacity: 0;
         transform: translateY(12px) scale(0.95);
       }
+
       to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -479,6 +495,7 @@
         bottom: 16px;
         right: 16px;
       }
+
       .support-modal {
         right: -8px;
         width: calc(100vw - 32px);
@@ -492,18 +509,19 @@
   </script>
 </head>
 
-<body
-  class="antialiased selection:bg-primary selection:text-white flex flex-col min-h-screen loading">
+<body class="antialiased selection:bg-primary selection:text-white flex flex-col min-h-screen loading">
   <header class="sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <a href="./" class="flex items-center gap-3 text-inherit no-underline">
         <div class="brand-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m12 3-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9Z"/>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9Z" />
           </svg>
         </div>
         <div>
-          <span class="text-sm md:text-xl font-bold tracking-tight text-white block leading-tight">Gemini Watermark Remover</span>
+          <span class="text-sm md:text-xl font-bold tracking-tight text-white block leading-tight">Gemini Watermark
+            Remover</span>
           <p class="text-xs text-gray-400 m-0">Khôi phục ảnh & video AI cục bộ</p>
         </div>
       </a>
@@ -512,11 +530,18 @@
           Trang chủ
         </a>
         <a class="nav-link active" href="./image">
-          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+            <circle cx="9" cy="9" r="2" />
+            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+          </svg>
           Xử lý Ảnh
         </a>
         <a class="nav-link" href="./video">
-          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="m22 8-6 4 6 4V8Z" />
+            <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
+          </svg>
           Xử lý Video
         </a>
         <!-- <a class="nav-link hidden md:inline-flex text-xs text-gray-400" href="https://geminiwatermarkremover.io/" target="_blank" rel="noopener noreferrer">
@@ -529,8 +554,9 @@
   <main class="flex-grow pb-16">
     <section class="pt-12 pb-8 text-center px-4">
       <div class="hero-badge mb-4">
-        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m12 3-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9Z"/>
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 3-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9Z" />
         </svg>
         Xử lý Ảnh Cục bộ • Khôi phục Alpha Inverse Không Suy Hao
       </div>
@@ -569,7 +595,8 @@
     <section id="singlePreview" class="max-w-6xl mx-auto px-4" style="display: none;">
       <div class="flex flex-col md:flex-row gap-6">
         <div class="flex-1">
-          <div class="rounded-xl shadow-lg border border-gray-700/50 overflow-hidden flex flex-col h-full bg-slate-900/80">
+          <div
+            class="rounded-xl shadow-lg border border-gray-700/50 overflow-hidden flex flex-col h-full bg-slate-900/80">
             <div class="px-4 py-2.5 border-b border-gray-700/50 flex justify-between items-center bg-slate-900/90">
               <h3 class="text-sm font-semibold text-gray-200 flex items-center gap-2">
                 So sánh trước / sau
@@ -580,8 +607,7 @@
               </div>
             </div>
 
-            <div
-              class="relative w-full flex-1 flex items-center justify-center select-none group min-h-[400px]">
+            <div class="relative w-full flex-1 flex items-center justify-center select-none group min-h-[400px]">
               <div id="comparisonContainer" class="relative mx-auto w-fit max-w-full">
                 <img id="originalImage"
                   class="block w-auto h-auto max-w-full max-h-[65vh] object-contain object-right-bottom"
@@ -604,10 +630,12 @@
                   </div>
                 </div>
                 <div
-                  class="absolute top-3 left-3 backdrop-blur text-gray-200 text-xs font-medium px-2 py-0.5 rounded shadow-sm border border-gray-700 pointer-events-none z-30" style="background: rgba(15, 23, 42, 0.8);">
+                  class="absolute top-3 left-3 backdrop-blur text-gray-200 text-xs font-medium px-2 py-0.5 rounded shadow-sm border border-gray-700 pointer-events-none z-30"
+                  style="background: rgba(15, 23, 42, 0.8);">
                   Sau xử lý</div>
                 <div
-                  class="absolute top-3 right-3 backdrop-blur text-gray-200 text-xs font-medium px-2 py-0.5 rounded shadow-sm border border-gray-700 pointer-events-none z-30" style="background: rgba(15, 23, 42, 0.8);">
+                  class="absolute top-3 right-3 backdrop-blur text-gray-200 text-xs font-medium px-2 py-0.5 rounded shadow-sm border border-gray-700 pointer-events-none z-30"
+                  style="background: rgba(15, 23, 42, 0.8);">
                   Ảnh gốc</div>
               </div>
             </div>
@@ -673,7 +701,7 @@
   </main>
 
   <footer class="preview-footer">
-    <div class="max-w-7xl mx-auto px-4">
+    <!-- <div class="max-w-7xl mx-auto px-4">
       <p>
         Trang kiểm tra nội bộ dùng để đánh giá nhanh cục bộ. Vui lòng tham khảo website chính thức và userscript để sử dụng đầy đủ.
       </p>
@@ -683,11 +711,10 @@
           Nguyên lý xóa hình mờ (Reverse Alpha Blending) ↗
         </a>
       </div>
-    </div>
+    </div> -->
   </footer>
 
-  <div id="loadingOverlay"
-    class="fixed inset-0 z-[60] hidden flex items-center justify-center">
+  <div id="loadingOverlay" class="fixed inset-0 z-[60] hidden flex items-center justify-center">
     <div class="flex flex-col items-center">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
       <p class="text-gray-300 font-medium">Đang xử lý...</p>
@@ -710,7 +737,8 @@
           </div>
         </div>
         <p class="support-desc">
-          Công cụ này hoàn toàn <strong>miễn phí 100%</strong>. Nếu nó giúp bạn tiết kiệm thời gian, hãy cân nhắc mời tôi một ly cà phê qua mã QR bên dưới — điều này giúp duy trì máy chủ và phát triển thêm các tính năng mới!
+          Công cụ này hoàn toàn <strong>miễn phí 100%</strong>. Nếu nó giúp bạn tiết kiệm thời gian, hãy cân nhắc mời
+          tôi một ly cà phê qua mã QR bên dưới — điều này giúp duy trì máy chủ và phát triển thêm các tính năng mới!
         </p>
         <div class="support-qr-box">
           <div class="qr-img-wrapper">
@@ -719,8 +747,10 @@
           <div class="qr-label">Quét mã QR qua ứng dụng Ngân hàng hoặc MoMo</div>
         </div>
         <button id="supportActionBtn" class="support-action-btn" type="button">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
           <span>Ủng hộ qua QR Code</span>
         </button>

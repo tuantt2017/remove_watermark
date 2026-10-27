@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini Watermark Remover - Xóa Watermark Ảnh & Video AI Cục Bộ</title>
+  <meta name="description"
+    content="Công cụ xóa watermark ảnh và video Google Gemini / Veo cục bộ trên trình duyệt bằng thuật toán Alpha Inverse và AI FDnCNN.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="https://geminiwatermarkremover.io/">
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m12 3-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9Z'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090d0b;
+      --bg-card: rgba(18, 26, 22, 0.85);
+      --bg-card-hover: rgba(23, 34, 28, 0.95);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(52, 211, 153, 0.4);
+      --primary: #34d399;
+      --primary-hover: #10b981;
+      --primary-subtle: rgba(52, 211, 153, 0.15);
+      --indigo: #818cf8;
+      --indigo-hover: #6366f1;
+      --indigo-subtle: rgba(129, 140, 248, 0.15);
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+      --shadow-hover: 0 25px 40px -10px rgba(16, 185, 129, 0.25);
+      --shadow-hover-video: 0 25px 40px -10px rgba(99, 102, 241, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(16, 185, 129, 0.12), transparent 45%),
+        radial-gradient(circle at 85% 15%, rgba(99, 102, 241, 0.12), transparent 45%),
+        radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.06), transparent 50%),
+        var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 20px 48px;
+      line-height: 1.6;
+    }
+
+    .container {
+      width: min(1040px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* Header Nav */
+    header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      display: grid;
+      place-items: center;
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      flex-shrink: 0;
+    }
+
+    .brand-text h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .brand-text p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      border-color: var(--text-dim);
+      transform: translateY(-1px);
+    }
+
+    .nav-link.active {
+      background: var(--primary-subtle);
+      color: var(--primary);
+      border-color: rgba(16, 185, 129, 0.35);
+      font-weight: 600;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 24px 16px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: var(--primary-subtle);
+      color: var(--primary);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .hero-badge svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.1rem, 4.5vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      max-width: 820px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #6366f1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: clamp(0.95rem, 1.8vw, 1.12rem);
+      color: var(--text-muted);
+      max-width: 680px;
+      line-height: 1.7;
+    }
+
+    /* Main Feature Cards Grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px;
+      margin-top: 8px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-lg);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      opacity: 0.85;
+      transition: height 0.2s ease, opacity 0.2s ease;
+    }
+
+    .card.image-card::before {
+      background: linear-gradient(90deg, #10b981, #34d399);
+    }
+
+    .card.video-card::before {
+      background: linear-gradient(90deg, #6366f1, #818cf8);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      background: var(--bg-card-hover);
+    }
+
+    .card.image-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card.video-card:hover {
+      border-color: rgba(99, 102, 241, 0.35);
+      box-shadow: var(--shadow-hover-video);
+    }
+
+    .card-top {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover .card-icon {
+      transform: scale(1.06);
+    }
+
+    .image-card .card-icon {
+      background: var(--primary-subtle);
+      color: var(--primary);
+    }
+
+    .video-card .card-icon {
+      background: var(--indigo-subtle);
+      color: var(--indigo);
+    }
+
+    .card-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .image-card .card-tag {
+      background: var(--primary-subtle);
+      color: var(--primary);
+    }
+
+    .video-card .card-tag {
+      background: var(--indigo-subtle);
+      color: var(--indigo);
+    }
+
+    .card h3 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.94rem;
+      line-height: 1.65;
+    }
+
+    .card-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 16px 0 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .card-features li svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .image-card .card-features li svg {
+      color: var(--primary);
+    }
+
+    .video-card .card-features li svg {
+      color: var(--indigo);
+    }
+
+    .card-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 50px;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #fff;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+      margin-top: 8px;
+    }
+
+    .card-btn svg {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.2s ease;
+    }
+
+    .card-btn:hover svg {
+      transform: translateX(4px);
+    }
+
+    .btn-image {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .btn-image:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-video {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    }
+
+    .btn-video:hover {
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+    }
+
+    /* Sub Actions */
+    .sub-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .sub-info h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .sub-info p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .sub-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .sub-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+      transition: all 0.15s ease;
+    }
+
+    .sub-btn:hover {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: var(--text-dim);
+      transform: translateY(-1px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .sub-btn:hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
+    }
+
+    /* Privacy & Features Banner */
+    .privacy-banner {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      padding: 8px 4px;
+    }
+
+    .privacy-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .privacy-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--primary-subtle);
+      color: var(--primary);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .privacy-item h5 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .privacy-item p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 0 16px 36px;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .privacy-banner {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 24px 20px;
+      }
+
+      .sub-section {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .sub-buttons {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .sub-btn {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <a href="./" class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9Z" />
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>Gemini Watermark Remover</h2>
+          <p>Khôi phục ảnh & video AI cục bộ</p>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a class="nav-link active" href="./">
+          Trang chủ
+        </a>
+        <a class="nav-link" href="./image">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+            <circle cx="9" cy="9" r="2" />
+            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+          </svg>
+          Xử lý Ảnh
+        </a>
+        <a class="nav-link" href="./video">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="m22 8-6 4 6 4V8Z" />
+            <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
+          </svg>
+          Xử lý Video
+        </a>
+        <!-- <a class="nav-link" href="https://geminiwatermarkremover.io/" target="_blank" rel="noopener noreferrer">
+          Website chính thức ↗
+        </a> -->
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="m12 3-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9Z" />
+        </svg>
+        100% Cục bộ • Bảo vệ chi tiết gốc • Miễn phí
+      </div>
+      <h1>Xóa Watermark <span class="gradient-text">Hình Ảnh & Video AI</span></h1>
+      <p>
+        Công cụ khôi phục ảnh và video gốc được tạo bởi Google Gemini và Veo. Sử dụng thuật toán đảo ngược Alpha toán
+        học và mô hình AI để loại bỏ watermark mà không làm giảm chất lượng nội dung.
+      </p>
+    </section>
+
+    <!-- Main Feature Choices -->
+    <main class="feature-grid">
+      <!-- Image Processing Card -->
+      <div class="card image-card">
+        <div class="card-top">
+          <div class="card-header-row">
+            <div class="card-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                <circle cx="9" cy="9" r="2" />
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+              </svg>
+            </div>
+            <span class="card-tag">Hình ảnh</span>
+          </div>
+          <h3>Xử Lý Ảnh</h3>
+          <p class="card-desc">
+            Xóa watermark trên hình ảnh tạo bởi Gemini mọi độ phân giải. Khôi phục hoàn hảo chi tiết nền bên dưới
+            watermark bằng thuật toán nghịch đảo Alpha đa kênh.
+          </p>
+          <ul class="card-features">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Hỗ trợ đầy đủ độ phân giải 0.5K, 1K, 2K và 4K
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Xử lý tức thì dưới 50ms, không nén suy hao ảnh
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Thanh trượt so sánh trực quan Trước / Sau
+            </li>
+          </ul>
+        </div>
+        <a class="card-btn btn-image" href="./image">
+          <span>Bắt đầu Xử lý Ảnh</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Video Processing Card -->
+      <div class="card video-card">
+        <div class="card-top">
+          <div class="card-header-row">
+            <div class="card-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="m22 8-6 4 6 4V8Z" />
+                <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
+              </svg>
+            </div>
+            <span class="card-tag">Video Veo</span>
+          </div>
+          <h3>Xử Lý Video</h3>
+          <p class="card-desc">
+            Xử lý video Veo và Gemini từng khung hình mượt mà ngay trên trình duyệt bằng WebCodecs và mô hình AI FDnCNN,
+            tự động xuất video MP4 sắc nét và giữ nguyên âm thanh.
+          </p>
+          <ul class="card-features">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              WebCodecs tăng tốc phần cứng, xử lý cực nhanh
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Mô hình AI FDnCNN ONNX làm sạch viền mờ tự nhiên
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Tự động ghép lại luồng âm thanh gốc vào video xuất
+            </li>
+          </ul>
+        </div>
+        <a class="card-btn btn-video" href="./video">
+          <span>Bắt đầu Xử lý Video</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+    </main>
+
+    <!-- Secondary Tools -->
+    <!-- <section class="sub-section">
+      <div class="sub-info">
+        <h4>Tiện ích mở rộng & Userscript cho Trình duyệt</h4>
+        <p>Tự động xóa watermark trực tiếp khi đang xem và tải ảnh trên trang web Google Gemini.</p>
+      </div>
+      <div class="sub-buttons">
+        <a class="sub-btn" href="userscript/gemini-watermark-remover.user.js" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Cài đặt Userscript
+        </a>
+        <a class="sub-btn" href="https://geminiwatermarkremover.io/" target="_blank" rel="noopener noreferrer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          Website chính thức ↗
+        </a>
+      </div>
+    </section> -->
+
+    <!-- Trust / Privacy Highlights -->
+    <section class="privacy-banner">
+      <div class="privacy-item">
+        <div class="privacy-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </div>
+        <div>
+          <h5>Bảo mật 100% Cục bộ</h5>
+          <p>Mọi tệp hình ảnh và video chỉ được xử lý ngay trong bộ nhớ RAM trình duyệt, không tải lên bất kỳ máy chủ
+            nào.</p>
+        </div>
+      </div>
+      <div class="privacy-item">
+        <div class="privacy-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+          </svg>
+        </div>
+        <div>
+          <h5>Hiệu năng Tối ưu</h5>
+          <p>Kết hợp WebCodecs và mô hình ONNX nhẹ giúp tốc độ xử lý nhanh, mượt mà mà không làm nóng máy.</p>
+        </div>
+      </div>
+      <div class="privacy-item">
+        <div class="privacy-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <div>
+          <h5>Mã nguồn mở Minh bạch</h5>
+          <p>Dự án mã nguồn mở, không theo dõi, không quảng cáo, hoàn toàn miễn phí cho cộng đồng.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>Gemini Watermark Remover &copy; 2026 • Giấy phép •</p>
+      <!-- Fallback anchor for SEO & legacy regression tests -->
+      <a href="./dev-preview.html" style="display:none" aria-hidden="true">dev-preview</a>
+    </footer>
+  </div>
+</body>
+
+</html>

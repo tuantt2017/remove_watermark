@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini Watermark Remover - Xử lý Hình Ảnh Cục bộ</title>
+  <meta name="description"
+    content="Internal image and video preview harness for the open-source Gemini watermark remover.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="https://geminiwatermarkremover.io/">
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg class='h-10 w-10 text-emerald-500' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="dev-preview.css">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090d0b;
+      --bg-card: rgba(18, 26, 22, 0.85);
+      --bg-card-hover: rgba(23, 34, 28, 0.95);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(52, 211, 153, 0.4);
+      --primary: #34d399;
+      --primary-hover: #10b981;
+      --primary-subtle: rgba(52, 211, 153, 0.15);
+      --indigo: #818cf8;
+      --indigo-hover: #6366f1;
+      --indigo-subtle: rgba(129, 140, 248, 0.15);
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+      --shadow-hover: 0 25px 40px -10px rgba(16, 185, 129, 0.25);
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(16, 185, 129, 0.12), transparent 45%),
+        radial-gradient(circle at 85% 15%, rgba(99, 102, 241, 0.12), transparent 45%),
+        radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.06), transparent 50%),
+        var(--bg) !important;
+      color: var(--text) !important;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header & Navigation */
+    header {
+      background: rgba(9, 13, 11, 0.85) !important;
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border) !important;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      display: grid;
+      place-items: center;
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      flex-shrink: 0;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-muted) !important;
+      text-decoration: none;
+      background: var(--bg-card) !important;
+      border: 1px solid var(--border) !important;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text) !important;
+      border-color: rgba(255, 255, 255, 0.2) !important;
+      transform: translateY(-1px);
+    }
+
+    .nav-link.active {
+      background: var(--primary-subtle) !important;
+      color: var(--primary) !important;
+      border-color: var(--border-hover) !important;
+      font-weight: 600;
+    }
+
+    /* Hero */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: var(--primary-subtle) !important;
+      color: var(--primary) !important;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      border: 1px solid rgba(52, 211, 153, 0.3) !important;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #34d399 0%, #60a5fa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Cards & Panels Overrides */
+    .bg-white, .bg-white\/95 {
+      background-color: var(--bg-card) !important;
+      backdrop-filter: blur(16px);
+      border-color: var(--border) !important;
+      color: var(--text) !important;
+    }
+
+    .bg-gray-50\/80, .bg-gray-50\/50, .bg-gray-100 {
+      background-color: var(--bg-card-hover) !important;
+      border-color: var(--border) !important;
+    }
+
+    .text-gray-900, .text-gray-800, .text-gray-700 {
+      color: var(--text) !important;
+    }
+
+    .text-gray-600, .text-gray-500, .text-gray-400 {
+      color: var(--text-muted) !important;
+    }
+
+    .border-gray-100, .border-gray-200, .border-gray-200\/80 {
+      border-color: var(--border) !important;
+    }
+
+    .shadow-sm, .shadow-lg {
+      box-shadow: var(--shadow-lg) !important;
+    }
+
+    /* Upload Area */
+    #uploadArea {
+      background: var(--bg-card) !important;
+      border-radius: 20px;
+      transition: all 0.2s ease;
+    }
+
+    #uploadArea:hover {
+      background: var(--bg-card-hover) !important;
+    }
+
+    #uploadArea .border-dashed {
+      border-color: rgba(52, 211, 153, 0.25) !important;
+    }
+
+    #uploadArea:hover .border-dashed {
+      border-color: rgba(52, 211, 153, 0.5) !important;
+    }
+
+    #uploadArea .w-12.h-12 {
+      background: var(--primary-subtle) !important;
+      color: var(--primary) !important;
+    }
+
+    /* Comparison Area */
+    #comparisonContainer {
+      background: #0d1319 !important;
+    }
+
+    [class*="bg-[url("] {
+      background-color: #0d1319 !important;
+    }
+
+    #singlePreview .bg-white\/90 {
+      background: rgba(15, 23, 42, 0.8) !important;
+      color: #fff !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+    }
+
+    /* Action Buttons */
+    #copyBtn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+      color: #fff !important;
+      font-weight: 600 !important;
+      border: none !important;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3) !important;
+    }
+
+    #copyBtn:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+      transform: translateY(-1px);
+    }
+
+    #downloadBtn {
+      background: linear-gradient(135deg, #34d399 0%, #059669 100%) !important;
+      color: #090d0b !important;
+      font-weight: 700 !important;
+      border: none !important;
+      box-shadow: 0 4px 14px rgba(52, 211, 153, 0.3) !important;
+    }
+
+    #downloadBtn:hover {
+      background: linear-gradient(135deg, #10b981 0%, #047857 100%) !important;
+      transform: translateY(-1px);
+    }
+
+    #resetBtn, #batchResetBtn {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text) !important;
+    }
+
+    #resetBtn:hover, #batchResetBtn:hover {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: rgba(255, 255, 255, 0.2) !important;
+      transform: translateY(-1px);
+    }
+
+    /* Batch Item */
+    .batch-item {
+      background: var(--bg-card-hover) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text) !important;
+    }
+
+    /* Loading Overlay */
+    #loadingOverlay {
+      background-color: rgba(9, 13, 11, 0.85) !important;
+    }
+
+    #loadingOverlay p {
+      color: var(--text) !important;
+    }
+
+    /* Footer */
+    footer.preview-footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 16px;
+      margin-top: auto;
+      text-align: center;
+      background: transparent !important;
+    }
+
+    footer.preview-footer p {
+      color: var(--text-dim) !important;
+      font-size: 0.82rem;
+      margin-bottom: 8px;
+    }
+
+    footer.preview-footer a {
+      color: var(--text-muted) !important;
+      font-size: 0.82rem;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    footer.preview-footer a:hover {
+      color: var(--primary) !important;
+      text-decoration: underline;
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.body.classList.remove('loading');
+    });
+  </script>
+</head>
+
+<body
+  class="antialiased selection:bg-primary selection:text-white flex flex-col min-h-screen loading">
+  <header class="sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="./" class="flex items-center gap-3 text-inherit no-underline">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9Z"/>
+          </svg>
+        </div>
+        <div>
+          <span class="text-sm md:text-xl font-bold tracking-tight text-white block leading-tight">Gemini Watermark Remover</span>
+          <p class="text-xs text-gray-400 m-0">Khôi phục ảnh & video AI cục bộ</p>
+        </div>
+      </a>
+      <nav class="flex gap-2 md:gap-3 text-sm font-medium items-center">
+        <a class="nav-link" href="./">
+          Trang chủ
+        </a>
+        <a class="nav-link active" href="./image">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+          Xử lý Ảnh
+        </a>
+        <a class="nav-link" href="./video">
+          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+          Xử lý Video
+        </a>
+        <!-- <a class="nav-link hidden md:inline-flex text-xs text-gray-400" href="https://geminiwatermarkremover.io/" target="_blank" rel="noopener noreferrer">
+          Website chính thức ↗
+        </a> -->
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-grow pb-16">
+    <section class="pt-12 pb-8 text-center px-4">
+      <div class="hero-badge mb-4">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 3-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9Z"/>
+        </svg>
+        Xử lý Ảnh Cục bộ • Khôi phục Alpha Inverse Không Suy Hao
+      </div>
+      <h1 class="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
+        Xóa Watermark <span class="gradient-text">Hình Ảnh</span> Gemini
+      </h1>
+      <p class="text-gray-400 max-w-2xl mx-auto mb-6 text-sm md:text-base">
+        Chọn hình ảnh để so sánh kết quả xử lý ngay trên trang này, chọn video sẽ tự động chuyển sang quy trình video.
+      </p>
+
+      <div class="max-w-3xl mx-auto rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl">
+        <div id="uploadArea"
+          class="group relative flex flex-col items-center justify-center w-full h-56 cursor-pointer">
+          <div
+            class="absolute inset-4 border-2 border-dashed border-emerald-500/30 rounded-lg group-hover:border-emerald-400/60 transition-colors pointer-events-none">
+          </div>
+          <div class="flex flex-col items-center justify-center relative z-10">
+            <div
+              class="w-12 h-12 rounded-full flex items-center justify-center mb-3 group-hover:scale-105 transition-all duration-200">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </div>
+            <p class="mb-1 text-base font-medium text-white">Bấm hoặc kéo thả tệp vào đây</p>
+            <p class="text-xs text-gray-400">Hỗ trợ chọn nhiều ảnh JPG, PNG, WebP; video sẽ chuyển sang quy trình video
+            </p>
+          </div>
+          <input type="file" id="fileInput"
+            accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,video/*" multiple
+            class="hidden" />
+        </div>
+      </div>
+    </section>
+
+    <section id="singlePreview" class="max-w-6xl mx-auto px-4" style="display: none;">
+      <div class="flex flex-col md:flex-row gap-6">
+        <div class="flex-1">
+          <div class="rounded-xl shadow-lg border border-gray-700/50 overflow-hidden flex flex-col h-full bg-slate-900/80">
+            <div class="px-4 py-2.5 border-b border-gray-700/50 flex justify-between items-center bg-slate-900/90">
+              <h3 class="text-sm font-semibold text-gray-200 flex items-center gap-2">
+                So sánh trước / sau
+              </h3>
+              <div class="flex gap-4">
+                <span id="originalInfo" class="text-xs text-gray-400 font-mono"></span>
+                <span id="processedInfo" class="text-xs text-primary font-mono" style="display: none;"></span>
+              </div>
+            </div>
+
+            <div
+              class="relative w-full flex-1 flex items-center justify-center select-none group min-h-[400px]">
+              <div id="comparisonContainer" class="relative mx-auto w-fit max-w-full">
+                <img id="originalImage"
+                  class="block w-auto h-auto max-w-full max-h-[65vh] object-contain object-right-bottom"
+                  draggable="false" />
+                <div id="processedOverlay"
+                  class="absolute top-0 left-0 h-full w-[50%] overflow-hidden border-r-[1.5px] border-white shadow-[1px_0_4px_rgba(0,0,0,0.15)] box-content z-10"
+                  style="display: none;">
+                  <img id="processedImage" class="block h-full max-w-none object-contain object-right-bottom"
+                    draggable="false" />
+                </div>
+                <div id="sliderHandle"
+                  class="absolute top-0 bottom-0 w-10 -ml-5 z-20 cursor-col-resize flex items-center justify-center group-hover:opacity-100 transition-opacity"
+                  style="left: 50%; display: none;">
+                  <div
+                    class="absolute w-7 h-7 bg-slate-900 rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex items-center justify-center border border-gray-600">
+                    <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M8 9l-3 3 3 3m8-6l3 3-3 3"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div
+                  class="absolute top-3 left-3 backdrop-blur text-gray-200 text-xs font-medium px-2 py-0.5 rounded shadow-sm border border-gray-700 pointer-events-none z-30" style="background: rgba(15, 23, 42, 0.8);">
+                  Sau xử lý</div>
+                <div
+                  class="absolute top-3 right-3 backdrop-blur text-gray-200 text-xs font-medium px-2 py-0.5 rounded shadow-sm border border-gray-700 pointer-events-none z-30" style="background: rgba(15, 23, 42, 0.8);">
+                  Ảnh gốc</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full md:w-64 lg:w-72 flex-shrink-0">
+          <div class="rounded-xl shadow-lg border border-gray-700/50 p-5 sticky top-20 bg-slate-900/80">
+            <h4 class="text-sm font-semibold text-gray-200 mb-4">Thao tác</h4>
+            <div class="space-y-2.5">
+              <button id="copyBtn"
+                class="w-full py-2 px-4 active:scale-[0.98] text-white rounded-lg text-sm font-medium transition-transform duration-100 flex items-center justify-center gap-2 shadow-sm"
+                style="display: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-1 10H8m4-3H8m1.5 6H8">
+                  </path>
+                </svg>
+                <span>Sao chép kết quả</span>
+              </button>
+
+              <button id="downloadBtn"
+                class="w-full py-2 px-4 active:scale-[0.98] text-white rounded-lg text-sm font-medium transition-transform duration-100 flex items-center justify-center gap-2 shadow-sm"
+                style="display: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                <span>Tải về kết quả</span>
+              </button>
+
+              <button id="resetBtn"
+                class="w-full py-2 px-4 border border-gray-700/60 text-gray-300 hover:bg-slate-800 active:scale-[0.98] rounded-lg text-sm font-medium transition-transform duration-100 flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                  </path>
+                </svg>
+                <span>Đổi tệp khác</span>
+              </button>
+            </div>
+            <div id="statusMessage" class="mt-4 text-xs text-gray-400 min-h-[1.25rem]"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="multiPreview" class="max-w-6xl mx-auto px-4" style="display: none;">
+      <div class="rounded-xl shadow-lg border border-gray-700/50 overflow-hidden bg-slate-900/80">
+        <div class="px-4 py-2.5 border-b border-gray-700/50 flex justify-between items-center bg-slate-900/90">
+          <div>
+            <h3 class="text-sm font-semibold text-gray-200">Xem trước hàng loạt</h3>
+            <p id="progressText" class="text-xs text-gray-400">Tiến độ xử lý: 0/0</p>
+          </div>
+          <button id="batchResetBtn"
+            class="py-2 px-4 border border-gray-700/60 text-gray-300 hover:bg-slate-800 active:scale-[0.98] rounded-lg text-sm font-medium transition-transform duration-100">
+            Đổi tệp khác
+          </button>
+        </div>
+        <div id="imageList" class="batch-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="preview-footer">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>
+        Trang kiểm tra nội bộ dùng để đánh giá nhanh cục bộ. Vui lòng tham khảo website chính thức và userscript để sử dụng đầy đủ.
+      </p>
+      <div>
+        <a href="https://allenkuo.medium.com/removing-gemini-ai-watermarks-a-deep-dive-into-reverse-alpha-blending-bbbd83af2a3f"
+          target="_blank" rel="noopener noreferrer">
+          Nguyên lý xóa hình mờ (Reverse Alpha Blending) ↗
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="loadingOverlay"
+    class="fixed inset-0 z-[60] hidden flex items-center justify-center">
+    <div class="flex flex-col items-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+      <p class="text-gray-300 font-medium">Đang xử lý...</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

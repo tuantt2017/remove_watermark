@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "buildCommand": "pnpm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/image",
+      "destination": "/dev-preview.html"
+    },
+    {
+      "source": "/images",
+      "destination": "/dev-preview.html"
+    },
+    {
+      "source": "/video",
+      "destination": "/video-preview.html"
+    },
+    {
+      "source": "/videos",
+      "destination": "/video-preview.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "Cross-Origin-Embedder-Policy",
+          "value": "require-corp"
+        }
+      ]
+    }
+  ]
+}

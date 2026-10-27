@@ -255,10 +255,10 @@ export async function inspectGeminiVideoFile(file) {
 
 export async function detectGeminiVideoWatermark(file, options = {}) {
     options.signal?.throwIfAborted();
-    const onProgress = typeof options.onProgress === 'function' ? options.onProgress : () => {};
+    const onProgress = typeof options.onProgress === 'function' ? options.onProgress : () => { };
     const yieldCallback = typeof options.yieldToMainThread === 'function'
         ? options.yieldToMainThread
-        : async () => {};
+        : async () => { };
     const yieldToMainThread = async () => {
         options.signal?.throwIfAborted();
         await yieldCallback();
@@ -908,7 +908,7 @@ export async function removeGeminiVideoWatermark(file, options = {}) {
         textureRepair,
         textureRepairStrength
     } = cleanupOptions;
-    const onProgress = typeof options.onProgress === 'function' ? options.onProgress : () => {};
+    const onProgress = typeof options.onProgress === 'function' ? options.onProgress : () => { };
     const videoBitrate = resolveVideoBitrate(options.videoBitrate);
 
     onProgress({ phase: 'detect', progress: 0 });
@@ -940,7 +940,7 @@ export async function removeGeminiVideoWatermark(file, options = {}) {
     onProgress({ phase: 'detect', progress: 1, metadata, detection });
 
     if (!detection.isConfident && options.allowLowConfidence !== true) {
-        throw new Error('视频水印检测置信度偏低，已停止导出。可打开低置信导出后重试。');
+        throw new Error('Mức độ tin cậy đối với việc phát hiện hình mờ (watermark) trong video quá thấp; quá trình xuất tệp đã bị dừng lại。');
     }
 
     const videoEncodingConfig = createVideoExportEncodingConfig(videoBitrate);
@@ -998,7 +998,7 @@ export async function removeGeminiVideoWatermark(file, options = {}) {
         audioCopyPromise = copyAudioPackets(audioCopy);
         // Audio runs alongside video; attach a handler immediately, then await
         // the original promise below so failures still fail the export.
-        audioCopyPromise.catch(() => {});
+        audioCopyPromise.catch(() => { });
         const samples = iterateVideoSamplesWithDecoderRecovery(() => new VideoSampleSink(videoTrack), {
             stats: decodeStats,
             signal: options.signal,
@@ -1117,7 +1117,7 @@ export async function removeGeminiVideoWatermark(file, options = {}) {
         };
     } catch (error) {
         if (output.state !== 'finalized' && output.state !== 'canceled') {
-            await output.cancel().catch(() => {});
+            await output.cancel().catch(() => { });
         }
         if (codecReclaimStats.recoveries > 0) {
             try {
@@ -1130,7 +1130,7 @@ export async function removeGeminiVideoWatermark(file, options = {}) {
     } finally {
         endReclaimableEncoding();
         input.dispose();
-        await audioCopyPromise?.catch(() => {});
+        await audioCopyPromise?.catch(() => { });
     }
 }
 
